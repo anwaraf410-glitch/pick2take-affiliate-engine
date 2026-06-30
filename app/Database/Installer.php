@@ -7,29 +7,33 @@ defined('ABSPATH') || exit;
 class Installer
 {
     public static function install(): void
-    {
-        global $wpdb;
+{
+    global $wpdb;
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-        $charset = $wpdb->get_charset_collate();
+    $charset = $wpdb->get_charset_collate();
 
-        $table = $wpdb->prefix . 'p2tae_logs';
+    $table = $wpdb->prefix . 'p2tae_logs';
 
-        $sql = "CREATE TABLE {$table} (
+    $sql = "CREATE TABLE {$table} (
 
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
-            level varchar(20),
+        level VARCHAR(20) NOT NULL,
 
-            message text,
+        message TEXT NOT NULL,
 
-            created_at datetime,
+        context LONGTEXT NULL,
 
-            PRIMARY KEY(id)
+        created_at DATETIME NOT NULL,
 
-        ) {$charset};";
+        PRIMARY KEY (id)
 
-        dbDelta($sql);
-    }
+    ) {$charset};";
+
+    dbDelta($sql);
+
+    update_option('p2tae_db_version', '1.0');
+}
 }

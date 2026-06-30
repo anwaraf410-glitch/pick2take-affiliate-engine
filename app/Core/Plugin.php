@@ -1,6 +1,6 @@
 <?php
 
-namespace P2TAE\Core;
+namespace use P2TAE\Core\Activator;
 
 defined('ABSPATH') || exit;
 
@@ -18,13 +18,15 @@ class Plugin
     }
 
     public function boot(): void
-    {
-        require_once P2TAE_PATH . 'app/Core/Autoloader.php';
+{
+    require_once P2TAE_PATH . 'app/Core/Autoloader.php';
 
-        Autoloader::register();
+    Autoloader::register();
 
-        add_action('plugins_loaded', [$this, 'load']);
-    }
+    register_activation_hook(P2TAE_FILE, [Activator::class, 'activate']);
+
+    add_action('plugins_loaded', [$this, 'load']);
+}
 
     public function load(): void
     {
