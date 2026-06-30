@@ -19,13 +19,15 @@ class Plugin
 
     public function boot(): void
     {
+        require_once P2TAE_PATH . 'app/Core/Autoloader.php';
+
+        Autoloader::register();
+
         add_action('plugins_loaded', [$this, 'load']);
     }
 
     public function load(): void
     {
-        require_once P2TAE_PATH . 'app/Admin/Admin.php';
-
         $admin = new \P2TAE\Admin\Admin();
         $admin->init();
     }
