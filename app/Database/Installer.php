@@ -6,34 +6,42 @@ defined('ABSPATH') || exit;
 
 class Installer
 {
+    /**
+     * Database version.
+     */
+    public const DB_VERSION = '1.0.0';
+
+    /**
+     * Install database tables.
+     */
     public static function install(): void
-{
-    global $wpdb;
+    {
+        global $wpdb;
 
-    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-    $charset = $wpdb->get_charset_collate();
+        $charset = $wpdb->get_charset_collate();
 
-    $table = $wpdb->prefix . 'p2tae_logs';
+        $logsTable = $wpdb->prefix . 'p2tae_logs';
 
-    $sql = "CREATE TABLE {$table} (
+        $sql = "CREATE TABLE {$logsTable} (
 
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
-        level VARCHAR(20) NOT NULL,
+            level VARCHAR(20) NOT NULL,
 
-        message TEXT NOT NULL,
+            message TEXT NOT NULL,
 
-        context LONGTEXT NULL,
+            context LONGTEXT NULL,
 
-        created_at DATETIME NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-        PRIMARY KEY (id)
+            PRIMARY KEY (id)
 
-    ) {$charset};";
+        ) {$charset};";
 
-    dbDelta($sql);
+        dbDelta($sql);
 
-    update_option('p2tae_db_version', '1.0');
-}
+        update_option('p2tae_db_version', self::DB_VERSION);
+    }
 }

@@ -1,13 +1,21 @@
 <?php
 
-namespace use P2TAE\Core\Activator;
+namespace P2TAE\Core;
 
 defined('ABSPATH') || exit;
 
+use P2TAE\Admin\Admin;
+
 class Plugin
 {
+    /**
+     * Plugin instance.
+     */
     private static ?Plugin $instance = null;
 
+    /**
+     * Get singleton instance.
+     */
     public static function instance(): Plugin
     {
         if (self::$instance === null) {
@@ -17,20 +25,33 @@ class Plugin
         return self::$instance;
     }
 
+    /**
+     * Boot plugin.
+     */
     public function boot(): void
-{
-    require_once P2TAE_PATH . 'app/Core/Autoloader.php';
+    {
+        require_once P2TAE_PATH . 'app/Core/Autoloader.php';
 
-    Autoloader::register();
+        Autoloader::register();
 
-    register_activation_hook(P2TAE_FILE, [Activator::class, 'activate']);
+        add_action('plugins_loaded', [$this, 'load']);
+    }
 
-    add_action('plugins_loaded', [$this, 'load']);
-}
-
+    /**
+     * Load plugin services.
+     */
     public function load(): void
     {
-        $admin = new \P2TAE\Admin\Admin();
-        $admin->init();
+        if (is_admin()) {
+            (new Admin())->init();
+        }
+
+        /**
+         * Future:
+         * API
+         * Importers
+         * Cron
+         * Logger
+         */
     }
 }

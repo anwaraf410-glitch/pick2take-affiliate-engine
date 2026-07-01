@@ -6,23 +6,30 @@ defined('ABSPATH') || exit;
 
 class Autoloader
 {
+    /**
+     * Register autoloader.
+     */
     public static function register(): void
     {
         spl_autoload_register([self::class, 'autoload']);
     }
 
+    /**
+     * Load class automatically.
+     */
     private static function autoload(string $class): void
     {
-        if (strpos($class, 'P2TAE\\') !== 0) {
+        if (!str_starts_with($class, 'P2TAE\\')) {
             return;
         }
 
-        $class = str_replace('P2TAE\\', '', $class);
-        $class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
+        $relative = substr($class, strlen('P2TAE\\'));
 
-        $file = P2TAE_PATH . 'app/' . $class . '.php';
+        $relative = str_replace('\\', DIRECTORY_SEPARATOR, $relative);
 
-        if (file_exists($file)) {
+        $file = P2TAE_PATH . 'app/' . $relative . '.php';
+
+        if (is_readable($file)) {
             require_once $file;
         }
     }

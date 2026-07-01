@@ -6,6 +6,9 @@ defined('ABSPATH') || exit;
 
 class Admin
 {
+    /**
+     * Initialize Admin.
+     */
     public function init(): void
     {
         $settings = new Settings();
@@ -14,9 +17,12 @@ class Admin
         add_action('admin_menu', [$this, 'menu']);
     }
 
+    /**
+     * Register admin menus.
+     */
     public function menu(): void
     {
-        // الصفحة الرئيسية
+        // Main Menu
         add_menu_page(
             'Pick2Take Affiliate Engine',
             'Pick2Take',
@@ -24,20 +30,43 @@ class Admin
             'pick2take-engine',
             [$this, 'dashboard'],
             'dashicons-store',
-            30
+            56
         );
 
-        // صفحة الإعدادات
+        // Dashboard
+        add_submenu_page(
+            'pick2take-engine',
+            'Dashboard',
+            'Dashboard',
+            'manage_options',
+            'pick2take-engine',
+            [$this, 'dashboard']
+        );
+
+        // Settings
         add_submenu_page(
             'pick2take-engine',
             'Settings',
             'Settings',
             'manage_options',
             'pick2take-settings',
-            [$this, 'settings']
+            ['P2TAE\Admin\Settings', 'render']
+        );
+
+        // Import Products
+        add_submenu_page(
+            'pick2take-engine',
+            'Import Products',
+            'Import Products',
+            'manage_options',
+            'pick2take-import',
+            [$this, 'importProducts']
         );
     }
 
+    /**
+     * Dashboard Page.
+     */
     public function dashboard(): void
     {
         ?>
@@ -45,9 +74,14 @@ class Admin
 
             <h1>Pick2Take Affiliate Engine</h1>
 
-            <p>Version <?php echo esc_html(P2TAE_VERSION); ?></p>
+            <p><strong>Version <?php echo esc_html(P2TAE_VERSION); ?></strong></p>
+
+            <h2>System Status</h2>
 
             <table class="widefat striped">
+
+                <tbody>
+
                 <tr>
                     <th>WordPress</th>
                     <td><?php echo esc_html(get_bloginfo('version')); ?></td>
@@ -63,35 +97,26 @@ class Admin
                     <td>
                         <?php
                         echo class_exists('WooCommerce')
-                            ? '✅ Installed'
-                            : '❌ Not Installed';
+                            ? 'Installed ✅'
+                            : 'Not Installed ❌';
                         ?>
                     </td>
                 </tr>
+
+                </tbody>
+
             </table>
 
         </div>
         <?php
     }
 
-    public function settings(): void
+    /**
+     * Import Products Page.
+     */
+    public function importProducts(): void
     {
-        ?>
-        <div class="wrap">
-
-            <h1>Settings</h1>
-
-            <form method="post" action="options.php">
-
-                <?php
-                settings_fields('p2tae_settings_group');
-                do_settings_sections('p2tae_settings_group');
-                submit_button();
-                ?>
-
-            </form>
-
-        </div>
-        <?php
+        $importer = new \P2TAE\Import\Importer();
+        $importer->render();
     }
 }
